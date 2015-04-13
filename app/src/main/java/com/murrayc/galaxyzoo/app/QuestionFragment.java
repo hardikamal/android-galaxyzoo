@@ -182,6 +182,8 @@ public class QuestionFragment extends BaseQuestionFragment
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
                              final Bundle savedInstanceState) {
+        cacheLoggedInStatus();
+
         mRootView = (QuestionLinearLayout) inflater.inflate(R.layout.fragment_question, container, false);
         assert mRootView != null;
 

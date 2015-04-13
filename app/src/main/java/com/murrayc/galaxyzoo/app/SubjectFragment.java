@@ -98,6 +98,8 @@ public class SubjectFragment extends ItemFragment
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
                              final Bundle savedInstanceState) {
+        cacheLoggedInStatus();
+
         mRootView = inflater.inflate(R.layout.fragment_subject, container, false);
         assert mRootView != null;
 

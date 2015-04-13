@@ -138,6 +138,8 @@ public class ClassifyFragment extends ItemFragment implements LoaderManager.Load
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
                              final Bundle savedInstanceState) {
+        cacheLoggedInStatus();
+
         mRootView = inflater.inflate(R.layout.fragment_classify, container, false);
         assert mRootView != null;
 

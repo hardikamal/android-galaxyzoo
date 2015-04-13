@@ -21,18 +21,49 @@ package com.murrayc.galaxyzoo.app;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.SpannableStringBuilder;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 /**
  * Created by murrayc on 8/7/14.
  */
 public class ZooFragment extends Fragment {
+    private boolean loggedIn = false;
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        //In case this is ever called, though derived classes generally don't call the Super onCreateView():
+        cacheLoggedInStatus();
+
+        return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    /** Asynchronously cache the log in status in loggedIn.
+     * Derived classes can call this in their onCreateView.
+     **/
+    protected void cacheLoggedInStatus() {
+        final LoginUtils.GetExistingLogin task = new LoginUtils.GetExistingLogin(getActivity()) {
+            @Override
+            protected void onPostExecute(final LoginUtils.LoginDetails loginDetails) {
+                super.onPostExecute(loginDetails);
+
+                ZooFragment.this.setLoggedIn(LoginUtils.getLoggedIn(loginDetails));
+            }
+        };
+        task.execute();
+    }
+
+    public void setLoggedIn(boolean loggedIn) {
+        this.loggedIn = loggedIn;
+    }
 
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
@@ -40,6 +71,9 @@ public class ZooFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.option_menu_item_login:
                 requestLogin();
+                return true;
+            case R.id.option_menu_item_logout:
+                requestLogout();
                 return true;
             case R.id.option_menu_item_about:
                 showAbout();
@@ -50,6 +84,25 @@ public class ZooFragment extends Fragment {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(final Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+
+        //Before the menu item is displayed,
+        //show either "Log in" or "Log out":
+        //This can only work if the derived Fragment has called cacheLoggedInStatus() in its onCreateView().
+        final MenuItem itemLogin = menu.findItem(R.id.option_menu_item_login);
+        final MenuItem itemLogout = menu.findItem(R.id.option_menu_item_logout);
+
+        if ((itemLogin == null) || (itemLogout == null)) {
+            Log.error("onPrepareOptionsMenu(): Could not find menu items.");
+            return;
+        }
+
+        itemLogin.setVisible(!loggedIn);
+        itemLogout.setVisible(loggedIn);
     }
 
     /*
@@ -75,6 +128,10 @@ public class ZooFragment extends Fragment {
     private void requestLogin() {
         final Intent intent = new Intent(getActivity(), LoginActivity.class);
         startActivity(intent);
+    }
+
+    private void requestLogout() {
+        LoginUtils.logOut(this);
     }
 
     private void showAbout() {

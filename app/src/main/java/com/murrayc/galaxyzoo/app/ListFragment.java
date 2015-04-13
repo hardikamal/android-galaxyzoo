@@ -148,6 +148,8 @@ public class ListFragment extends ZooFragment
         // We would only call the base class's onCreateView if we wanted the default layout:
         // super.onCreateView(inflater, container, savedInstanceState);
 
+        cacheLoggedInStatus();
+
         mRootView = inflater.inflate(R.layout.fragment_list, container, false);
         assert mRootView != null;
 
